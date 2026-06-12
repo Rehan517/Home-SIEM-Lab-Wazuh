@@ -29,20 +29,34 @@ Wazuh Dashboard - Browser
 | MITRE ATT&CK | v14 | Threat classification |
 
 ## What I Built
-- I built a simulation of a SOC system where logs are gathered from an endpoint which are displayed in a SIEM. This replicates a real system where live logs and events are picked up from a device in a network and viewed on a SIEM dashboard which are triaged depending on their threat level and severity.
+- Deployed Wazuh 4.7.5 on an AWS EC2 Ubuntu instance in the Sydney 
+  region, configured with appropriate security group rules to allow 
+  agent communication on ports 1514 and 1515 and dashboard access on 
+  port 443
+- Provisioned a Windows 11 ARM virtual machine using UTM on Apple 
+  Silicon, installed and registered the Wazuh agent, and verified active 
+  agent status in the Wazuh dashboard
+- Assigned a static Elastic IP to the AWS instance to ensure consistent 
+  agent connectivity across server restarts
 
 ## Attack Simulations and Findings
-- I similuated a **brute force attack** where multiple attempts were made to sign into the system with incorrect credentials. This was logged by the Wazuh SIEM as a 'Logon failure' with an event ID of 60122. The recommended steps were to verify if this user existed in the system through Active Directory, block further attempts, contact the endpoint owner, isolate the endpoint, reset credentials and escalate to L2 analyst.
+- I simuluated a **brute force attack** where multiple attempts were made to sign into the system with incorrect credentials. This was logged by the Wazuh SIEM as a 'Logon failure' with an event ID of 60122. The recommended steps were to verify if this user existed in the system through Active Directory, block further attempts, contact the endpoint owner, isolate the endpoint, reset credentials and escalate to L2 analyst.
 - Reviewed a **system error**, here the SIEM had detected multiple system error events simultaneously which is why it labeled the severity as a 10/12. The issue was to do with Trusted Platform Module driver which was not responding. This issue was expected from the Virtual Machine as it did not have a physical TPM chip so there was no malicious activity. The recommended steps were to tune rule 61110 to suppress the TPM errors specifically for known VM endpoints and add an exception in the SIEM for this endpoint and error type to reduce alert noise.
-- Reviewed a **system error**, here the SIEM detected multiple recurring Amppamor DENIED error events on Wazuh server itself. The Linux Apparmor security module blocked the built-in who command from reading a locale configuration file. The who command is a standard Linux utlility used by Wazuh internally to monitor logged-in users. The Apparmor profile for the who command does not include read permission for the locale file path being accessed. This is a profile gap rather than malicious activity. The recommended steps were to consider updating the Apparmor profile for the who command to include the locale file path.
+- Reviewed a **system error**, here the SIEM detected multiple recurring Apparmor DENIED error events on Wazuh server itself. The Linux Apparmor security module blocked the built-in who command from reading a locale configuration file. The who command is a standard Linux utility used by Wazuh internally to monitor logged-in users. The Apparmor profile for the who command does not include read permission for the locale file path being accessed. This is a profile gap rather than malicious activity. The recommended steps were to consider updating the Apparmor profile for the who command to include the locale file path.
 
 ## Key Learnings
-- How to setup a cloud Wazuh server
-- Setting up a Windows Virtual Machine
-- Seting up Wazuh Agent
-- Utilising Wazuh Dashboard
-- Triaging Alerts from Wazuh
-- Writing comprehensice triage reports
+- Deployed Wazuh SIEM on AWS EC2 including cloud infrastructure 
+  configuration, firewall rules, and SSH access management
+- Connected a Windows 11 ARM virtual machine as a monitored endpoint 
+  using the Wazuh Agent, including agent registration and service configuration
+- Simulated real attack techniques including brute force authentication 
+  attacks and system reconnaissance
+- Applied the SOC analyst triage workflow to classify and investigate 
+  security alerts using MITRE ATT&CK framework context
+- Wrote professional triage investigation reports documenting evidence, 
+  classification, analysis and recommended response for each alert
+- Identified and documented the importance of SIEM rule tuning to reduce 
+  alert fatigue from known benign events
 
 
 
