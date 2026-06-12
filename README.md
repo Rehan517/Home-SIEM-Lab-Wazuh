@@ -5,23 +5,45 @@ I built a home Security Operations Centre lab where a Windows endpoint is monito
 
 ## Lab Architecture  
 
+The Technologies used for the project consisted of AWS EC2 instance where the Wazuh server is deployed. Windows 11 VM through UTM on Mac which has the Wazuh agent setup and finally the Wazuh Dashboard is accessed through the browser.
+
+Windows 11 VM - UTM on Mac
+        
+        | Wazuh Agent (port 1514/1515)
+        
+Wazuh Server - AWS EC2 Sydney
+        
+        | HTTPS (port 443)
+        
+Wazuh Dashboard - Browser
 
 ## Tools and Technologies
-
+| Tool | Version | Purpose |
+|---|---|---|
+| Wazuh | 4.7.5 | SIEM platform |
+| AWS EC2 | c7i-flex.large | Cloud server hosting |
+| Ubuntu | 26.04 LTS | Wazuh server OS |
+| Windows 11 ARM | Build 26200 | Monitored endpoint |
+| UTM | Latest | Virtualisation on Apple Silicon |
+| PowerShell | 5.1 | Attack simulation |
+| MITRE ATT&CK | v14 | Threat classification |
 
 ## What I Built
-
+- I built a simulation of a SOC system where logs are gathered from an endpoint which are displayed in a SIEM. This replicates a real system where live logs and events are picked up from a device in a network and viewed on a SIEM dashboard which are triaged depending on their threat level and severity.
 
 ## Attack Simulations and Findings
-
-
-## Triage Reports
-
+- I similuated a **brute force attack** where multiple attempts were made to sign into the system with incorrect credentials. This was logged by the Wazuh SIEM as a 'Logon failure' with an event ID of 60122. The recommended steps were to verify if this user existed in the system through Active Directory, block further attempts, contact the endpoint owner, isolate the endpoint, reset credentials and escalate to L2 analyst.
+- Reviewed a **system error**, here the SIEM had detected multiple system error events simultaneously which is why it labeled the severity as a 10/12. The issue was to do with Trusted Platform Module driver which was not responding. This issue was expected from the Virtual Machine as it did not have a physical TPM chip so there was no malicious activity. The recommended steps were to tune rule 61110 to suppress the TPM errors specifically for known VM endpoints and add an exception in the SIEM for this endpoint and error type to reduce alert noise.
+- Reviewed a **system error**, here the SIEM detected multiple recurring Amppamor DENIED error events on Wazuh server itself. The Linux Apparmor security module blocked the built-in who command from reading a locale configuration file. The who command is a standard Linux utlility used by Wazuh internally to monitor logged-in users. The Apparmor profile for the who command does not include read permission for the locale file path being accessed. This is a profile gap rather than malicious activity. The recommended steps were to consider updating the Apparmor profile for the who command to include the locale file path.
 
 ## Key Learnings
+- How to setup a cloud Wazuh server
+- Setting up a Windows Virtual Machine
+- Seting up Wazuh Agent
+- Utilising Wazuh Dashboard
+- Triaging Alerts from Wazuh
+- Writing comprehensice triage reports
 
 
-## Skills Demonstrated
 
 
-## Screenshots
